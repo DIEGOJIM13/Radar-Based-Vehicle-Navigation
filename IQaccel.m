@@ -15,3 +15,4 @@ function [t, I, Q] = IQaccel(endSpeed,fs,fc,c,tLength)
     Q = Amp + Amp*chirp(t,0,tLength,endFreq,'linear', -90);
 end
 
+%Noelle22 was here
