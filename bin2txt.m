@@ -7,32 +7,48 @@
     %This File reads in binary files and converts them into newly created
     %text files
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clear;
-tic;
-for fileNum = 8:8%change these number to loop through all binary files
-    fileNum_char = sprintf('%d', fileNum);
-    filename = strcat('data/R2_5-4_set3/',fileNum_char);%change input file folder
 
-    fileID = fopen(strcat(filename,'.bin'),'r');
-    A = fread(fileID,'uint16');
-    fclose(fileID);
+function [left, right] = bin2txt()
+    left = []; right = [];
+    [filenameLeft, pathnameLeft] = uigetfile('*.bin', 'Select the left .bin file');
+    if isequal(filenameLeft,0)
+       return;
+    else
+       disp(['Left File  ', fullfile(pathnameLeft, filenameLeft)]);
+    end
+    [filenameRight, pathnameRight] = uigetfile('*.bin', 'Select the right .bin file');
+    if isequal(filenameRight,0)
+       return;
+    else
+       disp(['Right File ', fullfile(pathnameRight, filenameRight)]);
+    end
+
+    leftFileID = fopen(fullfile(pathnameLeft, filenameLeft), 'r');
+    leftRaw = fread(leftFileID, 'uint16');
+    fclose(leftFileID);
+
+    rightFileID = fopen(fullfile(pathnameRight, filenameRight), 'r');
+    rightRaw = fread(rightFileID, 'uint16');
+    fclose(rightFileID);
+
+    left = zeros(fix(size(leftRaw, 1) / 2), 3);
+    right = zeros(fix(size(rightRaw, 1) / 2), 3);
     
-    n = 1;
-    i = 1;
-    j = 1;
+    i = 1; n = 1;
     %convert 12bit ADC values to voltages
-    while i<=size(A,1)
-        data(j,1) = n;
-        data(j+1,1) = A(i)*3.3/4095;
-        data(j+2,1) = A(i+1)*3.3/4095;
-        n = n + 1;
-        i = i + 2;
-        j = j + 3;
+    while i <= fix(size(leftRaw, 1) / 2)
+        left(i,1) = i;
+        left(i,2) = leftRaw(n)*3.3/4095;
+        left(i,3) = leftRaw(n+1)*3.3/4095;
+        i = i + 1; n = n + 2;
+    end
+
+    i = 1; n = 1;
+    while i <= fix(size(rightRaw, 1) / 2)
+        right(i,1) = i;
+        right(i,2) = rightRaw(n)*3.3/4095;
+        right(i,3) = rightRaw(n+1)*3.3/4095;
+        i = i + 1; n = n + 2;
     end
     
-    %write to txt file
-    fileID = fopen(strcat(filename,'.txt'),'w');
-    fprintf(fileID, '%07d\t%.3f\t%.3f\n', data);
-    fclose(fileID);
-end
-toc;
+
