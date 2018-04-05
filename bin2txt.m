@@ -8,26 +8,37 @@
     %text files
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [left, right] = bin2txt()
-    left = []; right = [];
-    [filenameLeft, pathnameLeft] = uigetfile('*.bin', 'Select the left .bin file');
-    if isequal(filenameLeft,0)
-       return;
+function [left, right] = bin2txt(fileName1, fileName2)
+    if (exist('fileName1','var') && exist('fileName2','var'))
+        leftF = fileName1;
+        rightF = fileName2;
+    elseif (exist('fileName1','var'))
+        leftF = fileName1;
+        rightF = fileName1;
     else
-       disp(['Left File  ', fullfile(pathnameLeft, filenameLeft)]);
+        left = []; right = [];
+        [filenameLeft, pathnameLeft] = uigetfile('*.bin', 'Select the left .bin file');
+        if isequal(filenameLeft,0)
+           return;
+        else
+           disp(['Left File  ', fullfile(pathnameLeft, filenameLeft)]);
+        end
+        [filenameRight, pathnameRight] = uigetfile('*.bin', 'Select the right .bin file');
+        if isequal(filenameRight,0)
+           return;
+        else
+           disp(['Right File ', fullfile(pathnameRight, filenameRight)]);
+        end
+        leftF = fullfile(pathnameLeft, filenameLeft);
+    	rightF = fullfile(pathnameRight, filenameRight);
     end
-    [filenameRight, pathnameRight] = uigetfile('*.bin', 'Select the right .bin file');
-    if isequal(filenameRight,0)
-       return;
-    else
-       disp(['Right File ', fullfile(pathnameRight, filenameRight)]);
-    end
-
-    leftFileID = fopen(fullfile(pathnameLeft, filenameLeft), 'r');
+    
+    leftFileID = fopen(leftF, 'r');
     leftRaw = fread(leftFileID, 'uint16');
     fclose(leftFileID);
-
-    rightFileID = fopen(fullfile(pathnameRight, filenameRight), 'r');
+    
+    
+    rightFileID = fopen(rightF, 'r');
     rightRaw = fread(rightFileID, 'uint16');
     fclose(rightFileID);
 
